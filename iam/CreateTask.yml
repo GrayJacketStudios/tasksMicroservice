@@ -3,4 +3,4 @@ CreateTaskIAM:
   Action:
     - dynamodb:PutItem
   Resource:
-    - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/TasksTable
+    - ${self:custom.TasksTable.arn}

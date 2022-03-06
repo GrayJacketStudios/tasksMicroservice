@@ -47,7 +47,7 @@ const CreateTask = async (event) => {
   };
 
   await dynamodb.put({
-    TableName: 'TasksTable',
+    TableName: process.env.TASKS_TABLE_NAME,
     Item: task,
   }).promise();
 

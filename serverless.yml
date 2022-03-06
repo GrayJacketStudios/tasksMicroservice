@@ -24,6 +24,8 @@ provider:
   stage: ${opt:stage, 'dev'}
   region: sa-east-1
   memorySize: 256
+  environment:
+    TASKS_TABLE_NAME: ${self:custom.TasksTable.name}
 
 resources:
   Resources:
@@ -38,3 +40,8 @@ functions:
           method: post
     iamRoleStatements:
       - ${file(iam/CreateTask.yml):CreateTaskIAM}
+
+custom:
+  TasksTable:
+    name: !Ref TasksTable
+    arn: !GetAtt TasksTable.Arn
