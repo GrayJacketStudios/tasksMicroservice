@@ -1,8 +1,11 @@
-'use strict';
+import {v4 as uuid} from 'uuid';
+import AWS from 'aws-sdk';
 
 const headers = {
   "Content-Type": "application/json",
 };
+
+const dynamodb = new AWS.DynamoDB.DocumentClient();
 
 const checkBody = (event) => {
   if (!event.body) {
@@ -25,7 +28,7 @@ const notFullParameters = () => {
   };
 };
 
-const createTask = async (event) => {
+const CreateTask = async (event) => {
   const {title, description, dueDate, priority, status, userId} = JSON.parse(event.body);
 
   if(!checkBody(event)) {
@@ -33,6 +36,7 @@ const createTask = async (event) => {
   }
 
   const task = {
+    id: uuid(),
     title,
     description,
     dueDate,
@@ -42,6 +46,11 @@ const createTask = async (event) => {
     createdAt: new Date().toISOString()
   };
 
+  await dynamodb.put({
+    TableName: 'TasksTable',
+    Item: task,
+  }).promise();
+
   return {
     statusCode: 201,
     headers,
@@ -49,4 +58,4 @@ const createTask = async (event) => {
   };
 };
 
-module.exports.handler = createTask;
+export const handler = CreateTask;

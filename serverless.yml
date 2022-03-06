@@ -13,18 +13,31 @@
 
 service: weekly-tasks
 
-# You can pin your service to only deploy with a specific Serverless version
-# Check out our docs for more details
+plugins:
+  - serverless-bundle
+  - serverless-iam-roles-per-function
 frameworkVersion: '3'
 
 provider:
   name: aws
   runtime: nodejs12.x
   stage: ${opt:stage, 'dev'}
-
-# you can overwrite defaults here
-#  stage: dev
   region: sa-east-1
+  memorySize: 256
+
+resources:
+  Resources:
+    TasksTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: TasksTable
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
 
 functions:
   createTask:
@@ -33,3 +46,9 @@ functions:
       - httpApi:
           path: /task/add
           method: post
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:PutItem
+        Resource:
+          - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/TasksTable
