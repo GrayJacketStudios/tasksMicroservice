@@ -37,9 +37,17 @@ functions:
     events:
       - httpApi:
           path: /task/add
-          method: post
+          method: POST
     iamRoleStatements:
       - ${file(iam/CreateTask.yml):CreateTaskIAM}
+  getTasks:
+    handler: src/handlers/getTasks.handler
+    events:
+      - httpApi:
+          path: /tasks
+          method: GET
+    iamRoleStatements:
+      - ${file(iam/GetTasks.yml):GetTasksIAM}
 
 custom:
   TasksTable:

@@ -1,0 +1,6 @@
+GetTasksIAM:
+  Effect: Allow
+  Action:
+    - dynamodb:Scan
+  Resource:
+    - ${self:custom.TasksTable.arn}
