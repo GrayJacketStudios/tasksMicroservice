@@ -27,17 +27,7 @@ provider:
 
 resources:
   Resources:
-    TasksTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: TasksTable
-        BillingMode: PAY_PER_REQUEST
-        AttributeDefinitions:
-          - AttributeName: id
-            AttributeType: S
-        KeySchema:
-          - AttributeName: id
-            KeyType: HASH
+    TasksTable: ${file(resources/TasksTable.yml):TasksTable}
 
 functions:
   createTask:
@@ -47,8 +37,4 @@ functions:
           path: /task/add
           method: post
     iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - dynamodb:PutItem
-        Resource:
-          - arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/TasksTable
+      - ${file(iam/CreateTask.yml):CreateTaskIAM}
