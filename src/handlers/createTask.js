@@ -1,6 +1,12 @@
 import {v4 as uuid} from 'uuid';
 import AWS from 'aws-sdk';
 
+import middy from '@middy/core';
+import httpJsonBodyParser from '@middy/http-json-body-parser';
+import httpEventNormalizer from '@middy/http-event-normalizer';
+import httpErrorHandler from '@middy/http-error-handler';
+import createError from 'http-errors';
+
 const headers = {
   "Content-Type": "application/json",
 };
@@ -11,7 +17,7 @@ const checkBody = (event) => {
   if (!event.body) {
     return false;
   }
-  const {title, userId} = JSON.parse(event.body);
+  const {title, userId} = event.body;
   if(!title || !userId) {
     return false;
   }
@@ -28,8 +34,20 @@ const notFullParameters = () => {
   };
 };
 
+const pushTask = async (task) => {
+  try {
+    await dynamodb.put({
+      TableName: process.env.TASKS_TABLE_NAME,
+      Item: task,
+    }).promise();
+  } catch (error) {
+    console.error(error);
+    throw new createError.InternalServerError(error);
+  }
+};
+
 const CreateTask = async (event) => {
-  const {title, description, dueDate, priority, status, userId} = JSON.parse(event.body);
+  const {title, description, dueDate, priority, status, userId} = event.body;
 
   if(!checkBody(event)) {
     return notFullParameters();
@@ -46,10 +64,7 @@ const CreateTask = async (event) => {
     createdAt: new Date().toISOString()
   };
 
-  await dynamodb.put({
-    TableName: process.env.TASKS_TABLE_NAME,
-    Item: task,
-  }).promise();
+  await pushTask(task);
 
   return {
     statusCode: 201,
@@ -58,4 +73,7 @@ const CreateTask = async (event) => {
   };
 };
 
-export const handler = CreateTask;
+export const handler = middy(CreateTask)
+  .use(httpJsonBodyParser())
+  .use(httpEventNormalizer())
+  .use(httpErrorHandler());
