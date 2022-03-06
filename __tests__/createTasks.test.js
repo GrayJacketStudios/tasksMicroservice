@@ -37,14 +37,14 @@ jest.mock('aws-sdk', () => {
 
 describe("Check what happens if it receives correct data", () => {
     it("Send a body with all the needed parameters", async () => {
-        const body = JSON.stringify({
+        const body = {
             title: 'Test',
             description: 'Test',
             dueDate: '2020-01-01',
             priority: 'low',
             status: 'todo',
             userId: '1'
-        });
+        };
         const response = await handler({ body }, {});
         expect(response.statusCode).toBe(201);
     });
