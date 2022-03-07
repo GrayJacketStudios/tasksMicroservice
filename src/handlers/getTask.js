@@ -12,27 +12,35 @@ const headers = {
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
-const retrieveTasks = async() => {
+const retrieveTask = async(id) => {
   try {
-    const result = await dynamodb.scan({ TableName: process.env.TASKS_TABLE_NAME }).promise();
-    return result.Items;
+    const result = await dynamodb.get({
+      TableName: process.env.TASKS_TABLE_NAME,
+      Key: { id }
+     }).promise();
+    return result.Item;
    } catch (error) {
      console.error(error);
      throw new createError.InternalServerError(error);
    }
 };
 
-const GetTasks = async () => {
- let tasks = await retrieveTasks();
+const GetTask = async (event) => {
+  const { id } = event.pathParameters;
+ let task = await retrieveTask(id);
+
+  if(!task) {
+    throw new createError.NotFound(`Task with id "${id}" not found`);
+  }
 
   return {
     statusCode: 200,
     headers,
-    body: JSON.stringify(tasks),
+    body: JSON.stringify(task),
   };
 };
 
-export const handler = middy(GetTasks)
+export const handler = middy(GetTask)
   .use(httpJsonBodyParser())
   .use(httpEventNormalizer())
   .use(httpErrorHandler());

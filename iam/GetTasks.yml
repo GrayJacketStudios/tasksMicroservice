@@ -4,3 +4,17 @@ GetTasksIAM:
     - dynamodb:Scan
   Resource:
     - ${self:custom.TasksTable.arn}
+
+GetTaskIAM:
+  Effect: Allow
+  Action:
+    - dynamodb:GetItem
+  Resource:
+    - ${self:custom.TasksTable.arn}
+
+GetTaskByUserIAM:
+  Effect: Allow
+  Action:
+    - dynamodb:Query
+  Resource:
+    - ${self:custom.TasksTable.arn}

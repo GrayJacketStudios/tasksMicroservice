@@ -48,6 +48,22 @@ functions:
           method: GET
     iamRoleStatements:
       - ${file(iam/GetTasks.yml):GetTasksIAM}
+  getTask:
+    handler: src/handlers/getTask.handler
+    events:
+      - httpApi:
+          path: /task/{id}
+          method: GET
+    iamRoleStatements:
+      - ${file(iam/GetTasks.yml):GetTaskIAM}
+  getTaskByUser:
+    handler: src/handlers/getTaskByUser.handler
+    events:
+      - httpApi:
+          path: /tasks/{UserId}
+          method: GET
+    iamRoleStatements:
+      - ${file(iam/GetTasks.yml):GetTaskByUserIAM}
 
 custom:
   TasksTable:
