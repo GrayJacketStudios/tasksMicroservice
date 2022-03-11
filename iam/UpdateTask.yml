@@ -1,0 +1,6 @@
+UpdateTaskIAM:
+  Effect: Allow
+  Action:
+    - dynamodb:UpdateItem
+  Resource:
+    - ${self:custom.TasksTable.arn}

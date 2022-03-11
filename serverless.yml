@@ -48,6 +48,14 @@ functions:
           method: GET
     iamRoleStatements:
       - ${file(iam/GetTasks.yml):GetTasksIAM}
+  updateTask:
+    handler: src/handlers/updateTask.handler
+    events:
+      - httpApi:
+          path: /task/update/{id}
+          method: POST
+    iamRoleStatements:
+      - ${file(iam/UpdateTask.yml):UpdateTaskIAM}
   getTask:
     handler: src/handlers/getTask.handler
     events:
